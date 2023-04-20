@@ -1,0 +1,10 @@
+.idea
+*.exe
+*.log
+logs
+profiles
+main
+main.go
+app
+.DS_Store
+.env
