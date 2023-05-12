@@ -10,7 +10,8 @@ func (event *Event) Publisher() *actors.Publisher {
 		return event.publisher
 	}
 
-	return actors.NewPublisher(event.channel)
+	event.publisher = actors.NewPublisher(event.channel)
+	return event.publisher
 }
 
 func (event *Event) Consumer() *actors.Consumer {
@@ -18,7 +19,8 @@ func (event *Event) Consumer() *actors.Consumer {
 		return event.consumer
 	}
 
-	return actors.NewConsumer(event.channel)
+	event.consumer = actors.NewConsumer(event.channel)
+	return event.consumer
 }
 
 func (event *Event) Exchange(name, exchangeType string) *rabbit_service.Exchange {
