@@ -1,6 +1,7 @@
 package rabbit_event
 
 import (
+	"github.com/lowl11/lazy-rmq/actors"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"sync"
 )
@@ -13,12 +14,15 @@ type Event struct {
 
 	isDebug bool
 
+	consumers []*actors.Consumer
+
 	mutex sync.Mutex
 }
 
 func New(connectionString string) (*Event, error) {
 	event := &Event{
 		connectionString: connectionString,
+		consumers:        make([]*actors.Consumer, 0),
 		isDebug:          true,
 	}
 

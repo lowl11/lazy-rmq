@@ -18,6 +18,11 @@ func NewConsumer(channel *amqp.Channel) *Consumer {
 	}
 }
 
+func (consumer *Consumer) UpdateChannel(channel *amqp.Channel) *Consumer {
+	consumer.channel = channel
+	return consumer
+}
+
 func (consumer *Consumer) ErrorHandler(handler func(err error)) *Consumer {
 	consumer.errorHandler = handler
 	return consumer

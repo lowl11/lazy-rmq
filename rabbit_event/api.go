@@ -50,5 +50,18 @@ func (event *Event) Reconnect() error {
 	}
 
 	event.setConnection(connection, channel)
+
+	for _, consumer := range event.consumers {
+		consumer.UpdateChannel(channel)
+	}
 	return nil
+}
+
+func (event *Event) UpdatableConsumer(consumer *actors.Consumer) *Event {
+	if consumer == nil {
+		return event
+	}
+
+	event.consumers = append(event.consumers, consumer)
+	return event
 }
