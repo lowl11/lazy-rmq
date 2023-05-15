@@ -5,22 +5,17 @@ import (
 	"github.com/lowl11/lazy-rmq/rabbit_service"
 )
 
-func (event *Event) Publisher() *actors.Publisher {
-	if event.publisher != nil {
-		return event.publisher
-	}
+func (event *Event) ProductionMode() *Event {
+	event.isDebug = false
+	return event
+}
 
-	event.publisher = actors.NewPublisher(event.getChannel())
-	return event.publisher
+func (event *Event) Publisher() *actors.Publisher {
+	return actors.NewPublisher(event.getChannel())
 }
 
 func (event *Event) Consumer() *actors.Consumer {
-	if event.consumer != nil {
-		return event.consumer
-	}
-
-	event.consumer = actors.NewConsumer(event.getChannel())
-	return event.consumer
+	return actors.NewConsumer(event.getChannel())
 }
 
 func (event *Event) Exchange(name, exchangeType string) *rabbit_service.Exchange {
@@ -49,18 +44,11 @@ func (event *Event) IsClosed() bool {
 }
 
 func (event *Event) Reconnect() error {
-	connection, err := rabbit_service.NewConnection(event.connectionString)
-	if err != nil {
-		return err
-	}
-
-	channel, err := connection.Channel()
+	connection, channel, err := event.connect()
 	if err != nil {
 		return err
 	}
 
 	event.setConnection(connection, channel)
-	event.publisher = nil
-	event.consumer = nil
 	return nil
 }

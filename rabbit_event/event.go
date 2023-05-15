@@ -1,8 +1,6 @@
 package rabbit_event
 
 import (
-	"github.com/lowl11/lazy-rmq/actors"
-	"github.com/lowl11/lazy-rmq/rabbit_service"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"sync"
 )
@@ -10,29 +8,26 @@ import (
 type Event struct {
 	connectionString string
 
-	connection *amqp.Connection
 	channel    *amqp.Channel
+	connection *amqp.Connection
 
-	publisher *actors.Publisher
-	consumer  *actors.Consumer
+	isDebug bool
 
 	mutex sync.Mutex
 }
 
 func New(connectionString string) (*Event, error) {
-	connection, err := rabbit_service.NewConnection(connectionString)
-	if err != nil {
-		return nil, err
-	}
-
-	channel, err := connection.Channel()
-	if err != nil {
-		return nil, err
-	}
-
-	return &Event{
+	event := &Event{
 		connectionString: connectionString,
-		connection:       connection,
-		channel:          channel,
-	}, nil
+		isDebug:          true,
+	}
+
+	connection, channel, err := event.connect()
+	if err != nil {
+		return nil, err
+	}
+
+	event.setConnection(connection, channel)
+
+	return event, nil
 }
