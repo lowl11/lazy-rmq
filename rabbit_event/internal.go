@@ -4,6 +4,7 @@ import (
 	"github.com/lowl11/lazy-rmq/rabbit_service"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
+	"time"
 )
 
 func (event *Event) setConnection(connection *amqp.Connection, channel *amqp.Channel) {
@@ -54,7 +55,21 @@ func (event *Event) getChannel() *amqp.Channel {
 }
 
 func (event *Event) connect() (*amqp.Connection, *amqp.Channel, error) {
-	connection, err := rabbit_service.NewConnection(event.connectionString)
+	connection, err := rabbit_service.NewConnectionConfig(event.connectionString, time.Second*60)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	channel, err := connection.Channel()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return connection, channel, nil
+}
+
+func (event *Event) connectConfig(heartbeat time.Duration) (*amqp.Connection, *amqp.Channel, error) {
+	connection, err := rabbit_service.NewConnectionConfig(event.connectionString, heartbeat)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -44,7 +44,7 @@ func (event *Event) IsClosed() bool {
 }
 
 func (event *Event) Reconnect() error {
-	connection, channel, err := event.connect()
+	connection, channel, err := event.connectConfig(event.heartbeat)
 	if err != nil {
 		return err
 	}
